@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PH National ID Document AI - Demo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container">
+    <!-- Left Side - Main Application -->
+    <div class="left-panel">
+      <div class="header">
+        <h1>📄 Document AI Scanner</h1>
+        <p class="subtitle">Philippine National ID Processor</p>
+      </div>
+
+      <!-- Upload Section -->
+      <div class="upload-section" id="uploadSection">
+        <div class="upload-area" id="uploadArea">
+          <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          <h3>Upload Your National ID</h3>
+          <p>Drag and drop or click to browse</p>
+          <p class="file-info">Supports: JPEG, PNG, PDF (Max 10MB)</p>
+          <input type="file" id="fileInput" accept="image/jpeg,image/png,application/pdf" hidden>
+          <button class="browse-btn" id="browseBtn">Browse Files</button>
+        </div>
+
+        <!-- File Preview -->
+        <div class="file-preview" id="filePreview" style="display: none;">
+          <div class="preview-header">
+            <h3>Selected File</h3>
+            <button class="remove-btn" id="removeBtn">✕</button>
+          </div>
+          <div class="preview-content">
+            <img id="previewImage" src="" alt="Preview" style="display: none;">
+            <div class="file-details" id="fileDetails"></div>
+          </div>
+          <button class="process-btn" id="processBtn">
+            <span class="btn-text">Process Document</span>
+            <span class="btn-loader" style="display: none;">
+              <div class="spinner"></div>
+              Processing...
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading-section" id="loadingSection" style="display: none;">
+        <div class="loading-animation">
+          <div class="loading-spinner"></div>
+          <h3>Processing Your Document...</h3>
+          <p>Our AI is extracting information from your National ID</p>
+          <div class="progress-steps">
+            <div class="step active">
+              <div class="step-number">1</div>
+              <div class="step-label">Uploading</div>
+            </div>
+            <div class="step" id="step2">
+              <div class="step-number">2</div>
+              <div class="step-label">Processing</div>
+            </div>
+            <div class="step" id="step3">
+              <div class="step-number">3</div>
+              <div class="step-label">Extracting</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Validation Section (Hidden by default) -->
+      <div class="validation-section" id="validationSection" style="display: none;">
+        <div class="validation-header">
+          <h2>✓ Extraction Complete</h2>
+          <p class="validation-subtitle">Please review and correct any errors in the extracted information</p>
+        </div>
+
+        <div class="info-banner">
+          <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <div>
+            <strong>Why do we need your review?</strong>
+            <p>AI extraction may not be 100% accurate. Please verify and correct any mistakes to ensure your information
+              is properly recorded.</p>
+          </div>
+        </div>
+
+        <form id="validationForm">
+          <!-- Front Side Data -->
+          <div class="form-section" id="frontSection">
+            <h3 class="section-title">Front Side Information</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="uniqueIdNumber">ID Number</label>
+                <input type="text" id="uniqueIdNumber" name="uniqueIdNumber" placeholder="XXXX-XXXX-XXXX">
+              </div>
+              <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input type="text" id="lastName" name="lastName" placeholder="Enter last name">
+              </div>
+              <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input type="text" id="firstName" name="firstName" placeholder="Enter first name">
+              </div>
+              <div class="form-group">
+                <label for="middleName">Middle Name</label>
+                <input type="text" id="middleName" name="middleName" placeholder="Enter middle name">
+              </div>
+              <div class="form-group">
+                <label for="birthDate">Date of Birth</label>
+                <input type="text" id="birthDate" name="birthDate" placeholder="MM/DD/YYYY">
+              </div>
+              <div class="form-group full-width">
+                <label for="completeAddress">Complete Address</label>
+                <textarea id="completeAddress" name="completeAddress" rows="2"
+                  placeholder="Enter complete address"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rear Side Data -->
+          <div class="form-section" id="rearSection">
+            <h3 class="section-title">Back Side Information</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="issuedDate">Date Issued</label>
+                <input type="text" id="issuedDate" name="issuedDate" placeholder="MM/DD/YYYY">
+              </div>
+              <div class="form-group">
+                <label for="sex">Sex</label>
+                <input type="text" id="sex" name="sex" placeholder="M / F">
+              </div>
+              <div class="form-group">
+                <label for="bloodType">Blood Type</label>
+                <input type="text" id="bloodType" name="bloodType" placeholder="A+ / B+ / O+ / AB+">
+              </div>
+              <div class="form-group">
+                <label for="maritalStatus">Marital Status</label>
+                <input type="text" id="maritalStatus" name="maritalStatus" placeholder="Single / Married / Widowed">
+              </div>
+              <div class="form-group full-width">
+                <label for="placeOfBirth">Place of Birth</label>
+                <input type="text" id="placeOfBirth" name="placeOfBirth" placeholder="Enter place of birth">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="cancel-btn" id="cancelBtn">Cancel</button>
+            <button type="submit" class="submit-btn" id="submitBtn">
+              <span>Submit Verified Information</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Success/Error Messages -->
+      <div class="message-container" id="messageContainer"></div>
+    </div>
+
+    <!-- Right Side - Demo Information -->
+    <div class="right-panel">
+      <div class="demo-content">
+        <div class="demo-badge">DEMO</div>
+        <h2>AI-Powered Document Processing</h2>
+        <p class="demo-description">
+          This is a demonstration of automated document processing using Google Document AI.
+          Experience how artificial intelligence can extract and structure information from Philippine National IDs.
+        </p>
+
+        <div class="features">
+          <div class="feature">
+            <div class="feature-icon">🤖</div>
+            <h3>AI Extraction</h3>
+            <p>Advanced machine learning models automatically extract text and structured data</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">👤</div>
+            <h3>Human Verification</h3>
+            <p>Validate and correct AI extractions to ensure 100% accuracy</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">⚡</div>
+            <h3>Lightning Fast</h3>
+            <p>Process documents in seconds instead of manual data entry</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">🔒</div>
+            <h3>Secure & Private</h3>
+            <p>Your documents are processed securely and never stored permanently</p>
+          </div>
+        </div>
+
+        <div class="demo-note">
+          <h4>How It Works</h4>
+          <ol>
+            <li>Upload your Philippine National ID (front or both sides)</li>
+            <li>AI automatically extracts all information</li>
+            <li>Review and correct any errors</li>
+            <li>Submit verified data</li>
+          </ol>
+        </div>
+
+        <div class="tech-stack">
+          <p class="tech-label">Powered by</p>
+          <div class="tech-badges">
+            <span class="tech-badge">Google Document AI</span>
+            <span class="tech-badge">FastAPI</span>
+            <span class="tech-badge">Python</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+
+</html>
