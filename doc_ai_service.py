@@ -189,4 +189,10 @@ class DocumentAIService:
         return front_data, rear_data, processor_type, combined_text
 
 # Initialize service as singleton
-doc_ai_service = DocumentAIService()
+doc_ai_service = None
+
+def get_doc_ai_service():
+    global doc_ai_service
+    if doc_ai_service is None:
+        doc_ai_service = DocumentAIService()
+    return doc_ai_service

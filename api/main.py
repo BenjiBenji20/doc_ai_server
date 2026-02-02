@@ -1,6 +1,6 @@
 from fastapi import FastAPI, APIRouter, UploadFile, File, HTTPException
 from fastapi.responses import JSONResponse
-from doc_ai_service import doc_ai_service
+from doc_ai_service import get_doc_ai_service
 from config import settings
 from schemas import NationalIDResponse, ProcessorType
 from fastapi.middleware.cors import CORSMiddleware
@@ -25,8 +25,8 @@ async def test_connection():
     """
     try:
         # Try to access the processor names to verify connection
-        front_processor = doc_ai_service.front_processor_name
-        rear_processor = doc_ai_service.rear_processor_name
+        front_processor = get_doc_ai_service().front_processor_name
+        rear_processor = get_doc_ai_service().rear_processor_name
         
         return {
             "success": True,
@@ -62,7 +62,7 @@ async def process_front_id(file: UploadFile = File(...)):
             )
         
         # Process the document
-        front_data, raw_text = doc_ai_service.process_front_id(file_content, mime_type)
+        front_data, raw_text = get_doc_ai_service().process_front_id(file_content, mime_type)
         
         return NationalIDResponse(
             success=True,
@@ -100,7 +100,7 @@ async def process_rear_id(file: UploadFile = File(...)):
             )
         
         # Process the document
-        rear_data, raw_text = doc_ai_service.process_rear_id(file_content, mime_type)
+        rear_data, raw_text = get_doc_ai_service().process_rear_id(file_content, mime_type)
         
         return NationalIDResponse(
             success=True,
@@ -143,7 +143,7 @@ async def process_auto_detect(file: UploadFile = File(...)):
             )
         
         # Process with both processors
-        front_data, rear_data, processor_type, raw_text = doc_ai_service.process_both_sides(
+        front_data, rear_data, processor_type, raw_text = get_doc_ai_service().process_both_sides(
             file_content, 
             mime_type
         )
