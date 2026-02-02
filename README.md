@@ -1,6 +1,28 @@
-# PH National ID Document AI Processor
+# PH Document AI Processor
 
-FastAPI backend for processing Philippine National ID using Google Document AI with custom trained processors.
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Google Document AI](https://img.shields.io/badge/Google%20Document%20AI-4285F4?logo=google-cloud&logoColor=white)](https://cloud.google.com/document-ai)
+[![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white)](https://vercel.com/)
+[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com/)
+[![Google Sheets](https://img.shields.io/badge/Google%20Sheets-34A853?logo=google-sheets&logoColor=white)](https://www.google.com/sheets/about/)
+
+<p align="center">
+   <img width="1654" height="850" alt="Image" src="https://github.com/user-attachments/assets/c3843aa9-49a7-44a0-ac4b-762a03037eb8" />
+</p>
+
+This project demonstrates how document data encoding can be automated using **modern AI-driven solutions** to reduce human error and free up time for higher-value tasks.
+
+The current prototype supports **Philippine National ID processing only**. Its document processor is intentionally limited at this stage, but the **architecture is designed to be extensible**. Future updates will introduce additional processors for other **Philippine documents**, such as Certificates of Live Birth and other government-issued IDs.
+
+This repository can also be used as a reference or integrated directly into your own application by following the setup and usage guide provided.
+
+## Project Technologies
+
+- **FastAPI**: Handles API requests, request validation, and server-side logic while keeping secrets and credentials securely on the backend.
+- **Google Document AI (Custom Extractor)**: Extracts structured data from documents using a trained AI model tailored to specific document formats.
+- **Vercel Serverless Functions** – Hosts the FastAPI backend as serverless functions, enabling scalable, on-demand execution without managing servers.
+- **Supabase**: Provides a real-time database and backend services for storing and synchronizing application data.
+- **Google Sheets API**: Used as a lightweight data store and reporting layer for extracted document data.
 
 ## Features
 
@@ -8,17 +30,44 @@ FastAPI backend for processing Philippine National ID using Google Document AI w
 - ✅ Process **rear side** of PH National ID (extracts: issued_date, sex, blood_type, marital_status, place_of_birth)
 - ✅ **Auto-detect** mode for PDFs containing both sides
 - ✅ Support for images (JPEG, PNG) and PDF files
-- ✅ Connection testing endpoint
+- ✅ Rate limiting to avoid API abuse
+- ✅ Real-time **database connection** through Supabase
+- ✅ Real-time **Google Spreadsheet** data insertion
+
+## System Architecture and Flow
+
+<p align="center">
+   <img width="1104" height="657" alt="Image" src="https://github.com/user-attachments/assets/e3285eb4-a352-4a96-a4f2-f316727abfe0" />
+</p>
+
+1. User access the application and upload a document.
+2. The document then goes to the server and pass to Google Cloud Document AI to extract texts.
+3. The extracted texts then pass to the server to client to validate by the user.
+4. The validated text will be stored in PostgreSQL through Supabase and Google Sheet all in real-time.
 
 ## Setup Instructions
 
-### 1. Install Dependencies
+### Clone the Repository
+
+```
+git clone https://github.com/BenjiBenji20/PH_Documents_AI_Text_Automation.git
+cd PH_Documents_AI_Text_Automation
+```
+
+### Create and Activate Python Virtual Environment
+
+```
+python -m venv venv
+source venv/bin/activate  # On Windows: .venv\Scripts\activate
+```
+
+### Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Configure Environment Variables
+### Configure Environment Variables
 
 Create a `.env` file in the root directory with your Google Cloud credentials:
 
@@ -48,8 +97,9 @@ REAR_NATIONAL_ID_PROCESSOR_ID=...
 **Important Notes:**
 - Make sure your `private_key` value includes the quotes and proper newline characters (`\n`)
 - Replace all placeholder values with your actual Google Cloud credentials
+- Make sure to change the prefix API url in index.json to your actual domain
 
-### 3. Run the Application
+### Run the Application
 
 ```bash
 # Using uvicorn directly
@@ -63,16 +113,7 @@ The API will be available at: `http://localhost:8000`
 
 ## API Endpoints
 
-### 1. Health Check
-**GET** `/api/doc-ai/`
-
-Test if the service is running.
-
-```bash
-curl http://localhost:8000/api/doc-ai/
-```
-
-### 2. Test Connection
+### 1. Test Connection
 **POST** `/api/doc-ai/test-connection`
 
 Verify that Google Document AI credentials are properly configured.
@@ -94,7 +135,7 @@ Verify that Google Document AI credentials are properly configured.
 }
 ```
 
-### 3. Process Front ID
+### 2. Process Front ID
 **POST** `/api/doc-ai/process-front`
 
 Process only the front side of PH National ID.
@@ -125,7 +166,7 @@ Process only the front side of PH National ID.
 }
 ```
 
-### 4. Process Rear ID
+### 3. Process Rear ID
 **POST** `/api/doc-ai/process-rear`
 
 Process only the rear side of PH National ID.
@@ -155,7 +196,7 @@ Process only the rear side of PH National ID.
 }
 ```
 
-### 5. Process Auto-Detect (Recommended)
+### 4. Process Auto-Detect (Recommended)
 **POST** `/api/doc-ai/process-auto`
 
 Automatically detect and process front, rear, or both sides.
@@ -197,56 +238,6 @@ Automatically detect and process front, rear, or both sides.
 }
 ```
 
-## Testing with Postman
-
-### Step-by-Step Testing Guide
-
-1. **Start the server:**
-   ```bash
-   uvicorn main:app --reload
-   ```
-
-2. **Test connection first:**
-   - Create a new request in Postman
-   - Method: POST
-   - URL: `http://localhost:8000/api/doc-ai/test-connection`
-   - Click "Send"
-   - You should see a success message with processor information
-
-3. **Test with a file:**
-   - Create a new request
-   - Method: POST
-   - URL: `http://localhost:8000/api/doc-ai/process-auto` (recommended) or specific endpoint
-   - Go to "Body" tab
-   - Select "form-data"
-   - Add a key named `file` with type "File"
-   - Click "Select Files" and choose your National ID image or PDF
-   - Click "Send"
-
-4. **Check the response:**
-   - Look for `"success": true`
-   - Verify extracted data in `front_data` and/or `rear_data`
-   - Check `raw_text` for debugging if needed
-
-## File Structure
-
-```
-.
-├── main.py                 # FastAPI application and endpoints
-├── config.py              # Environment configuration
-├── models.py              # Pydantic models for request/response
-├── doc_ai_service.py      # Document AI processing logic
-├── requirements.txt       # Python dependencies
-├── .env                   # Environment variables (create this)
-├── .env.example          # Example environment file
-└── README.md             # This file
-```
-
-## Supported File Types
-
-- **Images:** JPEG (.jpg, .jpeg), PNG (.png)
-- **Documents:** PDF (.pdf)
-
 ## Error Handling
 
 The API returns detailed error messages when:
@@ -261,6 +252,33 @@ Example error response:
   "detail": "Error processing ID: [error details]"
 }
 ```
+
+## File Structure
+
+```
+├── api/
+      ├── main.py          # FastAPI application and endpoints
+├── doc/                   # Project documentation
+      ├── .pdf/.png..      
+├── public/                # Static directory
+      ├── index.html       # Static html
+      ├── style.css        # Static css
+      ├── index.js         # JS to fetch to serverless functions
+├── config.py              # Environment configuration
+├── schemas.py             # Pydantic models for request/response
+├── doc_ai_service.py      # Document AI processing logic
+├── requirements.txt       # Python dependencies
+├── .env                   # Environment variables (create this)
+├── vercel.json            # Vercel configuration
+└── README.md              # This file
+```
+
+This follows Vercel's project route standard.
+
+## Supported File Types
+
+- **Images:** JPEG (.jpg, .jpeg), PNG (.png)
+- **Documents:** PDF (.pdf)
 
 ## Tips for Best Results
 
@@ -284,3 +302,13 @@ Example error response:
 ### "Module not found"
 - Run `pip install -r requirements.txt`
 - Ensure you're in the correct virtual environment
+
+## Notice
+
+In the future I plan to create another processor to handle more local documents such as certificate of live birth and other document and ID specific in the Philippines.
+
+Having difficulty of finding data to uptrain your Doc AI processor? You can use my synthetic dataset of PH National ID.
+Get them in **https://drive.google.com/drive/folders/1SVa5no_zh8FbM9uRLpr5QYJ8rJ0m5eO4?usp=sharing**
+
+### I need a job and of course money!!!
+Please email me at **benjicanones6@gmail.com**
