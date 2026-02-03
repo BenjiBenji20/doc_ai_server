@@ -1,14 +1,15 @@
 // ===================================
 // Configuration
 // ===================================
+// 'https://doc-ai-server.vercel.app'
 const CONFIG = {
-    API_URL: 'https://doc-ai-server.vercel.app',
+    API_URL: 'http://localhost:8000',
     MAX_FILE_SIZE: 10 * 1024 * 1024, // 10MB
     ALLOWED_TYPES: ['image/jpeg', 'image/png', 'application/pdf'],
     ENDPOINTS: {
         PROCESS_AUTO: '/api/doc-ai/process-auto',
-        PROCESS_FRONT: '/api/doc-ai/process-front',
-        PROCESS_REAR: '/api/doc-ai/process-rear'
+        VALIDATE_DATA: '/api/doc-ai/submit-validated-data',
+        // add more here in the future if you have more processors
     }
 };
 
@@ -277,7 +278,7 @@ function setFieldValue(fieldId, value) {
 // ===================================
 // Form Submission
 // ===================================
-function handleFormSubmit(e) {
+async function handleFormSubmit(e) {
     e.preventDefault();
 
     // Collect validated data
@@ -310,20 +311,21 @@ function handleFormSubmit(e) {
         };
     }
 
-    // Log the validated data (you'll send this to your backend)
-    console.log('Validated Data:', validatedData);
+    // Send validatedData to your backend endpoint
+    const data = await fetch(`${CONFIG.API_URL}${CONFIG.ENDPOINTS.VALIDATE_DATA}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(validatedData)
+    });
 
-    // Show success message
-    showMessage('success', 'Data Submitted',
-        'Your verified information has been submitted successfully!');
+    const response = await data.json();
 
-    // TODO: Send validatedData to your backend endpoint
-    // Example:
-    // fetch(`${CONFIG.API_URL}/api/submit-validated-data`, {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify(validatedData)
-    // });
+    // Show response message
+    showMessage(
+        response.success ? 'success' : 'failed', 
+        response.description,
+        response.message
+    );
 
     // Reset and go back to upload
     setTimeout(() => {
