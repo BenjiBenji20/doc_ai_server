@@ -1,9 +1,10 @@
 // ===================================
 // Configuration
 // ===================================
-// 'https://doc-ai-server.vercel.app'
+// 'http://localhost:8000'
+
 const CONFIG = {
-    API_URL: 'http://localhost:8000',
+    API_URL: 'https://doc-ai-server.vercel.app',
     MAX_FILE_SIZE: 10 * 1024 * 1024, // 10MB
     ALLOWED_TYPES: ['image/jpeg', 'image/png', 'application/pdf'],
     ENDPOINTS: {
